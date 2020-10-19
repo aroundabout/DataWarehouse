@@ -54,13 +54,16 @@ PROXY_FETCHER = [
     "freeProxy07",
     # "freeProxy08",
     # "freeProxy09",
+    "freeProxy10",
+    "freeProxy11",
+    "freeProxy12",
     "freeProxy13",
     "freeProxy14",
     "freeProxy15",
 ]
 
 # ############# proxy validator #################
-VERIFY_RUL = "http://www.baidu.com"
+VERIFY_RUL = "https://www.baidu.com"
 
 VERIFY_TIMEOUT = 10
 
