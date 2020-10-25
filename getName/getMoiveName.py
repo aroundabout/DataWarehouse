@@ -8,6 +8,10 @@ import re
 # 引号也要删掉"" ''
 # 另外，不同的vol也认为是不同的movie
 # 认为年份不同也是不同的电影
+# 标题中表示商品为电影合集，电影数量无法统计
+# the letter 和the letter(1994) 这种怎么算还不知道
+
+
 # 总之先删除首尾的 '' ""
 
 def create_csv():
@@ -53,7 +57,7 @@ def get_key_word():
         if len(targetString1) > 0:
             for item in targetString1:
                 # 排除年份
-                newItem = item.strip('(').strip(')').replace('-', '').replace('/', '')
+                newItem = item.strip('(').strip(')').strip().replace('-', '').replace('/', '')
                 if newItem.isdigit():
                     continue
                 # print(item)
@@ -61,7 +65,7 @@ def get_key_word():
         if len(targetString2) > 0:
             for item in targetString2:
                 #  print(item)
-                newItem = item.strip('[').strip(']')
+                newItem = item.strip('[').strip(']').strip().replace('-', '').replace('/', '')
                 if newItem.isdigit():
                     continue
                 result.add(item)
@@ -73,7 +77,8 @@ def get_key_word():
         print(item)
     print(len(result))
     # 排除年份有7215个关键词
-    # 排除年份中有- / 的之后还有7184
+    # 排除年份中有- / 的之后还有7183
+    # 有年份和国家混合的，不同国家地区的认为是不同的电影
 
 
 get_key_word()
