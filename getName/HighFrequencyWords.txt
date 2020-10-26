@@ -1,6 +1,7 @@
 VHS
 vhs
 BD
+dvd
 ray
 Blu
 DVD
@@ -33,6 +34,7 @@ Ultimate
 Seasons
 FORMAT
 3D
+3-D
 Hollywood
 Movies
 NON
@@ -40,3 +42,18 @@ PAL
 IMAX
 DVDs
 Universal's
+IMPORT
+Import
+Slim Case
+Hallmark
+Screen
+widescreen
+Disney
+Classic
+AKA
+aka
+Enhanced
+Exclusive
+Amazon
+Fullscreen
+screen

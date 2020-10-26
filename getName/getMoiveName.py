@@ -20,8 +20,11 @@
 # 其次是国家的处理，括号内含如 CN UK USA表示电影在不同的国家或者地区，根据不同的审核规则，电影的内容也不完全相同，认为是不同的电影
 # 关于括号内是相同电影名字的不同翻译的情况，这里认为可以直接删除，理由如下
 # 若存在另一个商品名字为同一电影的不同翻译，则一般可以认为是面向另一国家的出版物，处理原则与上文相同，认为是不同的电影
+# 不同配音可以直接删
+# unrated 和rated 有没有分级也认为是不同电影
 # vol认为是不同的卷，认为是不同的电影
-# 导演剪辑版和普通版不是一个
+# 导演剪辑版和普通版不是一个 其他的剪辑版本也认为是不同的电影
+# 3d和2d认为是一部电影
 
 # 关于电影合集的情况
 # 在商品中存在电影合集，在这种情况下，无视商品本身的名字，直接读取括号内的字符串，根据 / 符号或者其他类似意义的符号分割字符串，获得电影名字
@@ -147,9 +150,11 @@ def removeOuterParentheses(S: str) -> str:
 def word_joint(firstHalf, roundBrackets, squareBrackets):
     result = firstHalf
     for item in roundBrackets:
-        result += item
+        result += '(' + item + ')'
     for item in squareBrackets:
         result += item
+    # print(result)
+
     return result
 
 
@@ -159,10 +164,8 @@ def get_name():
     errorWord = set()
     # 读取词库
     for line in open('HighFrequencyWords.txt', 'r', encoding='utf-8'):
-        # print(line.strip('\n').strip())
         keyWord.add(line.strip('\n').strip())
     for line in open('ErrorWord.txt', 'r', encoding='utf-8'):
-        # print(line.strip('\n').strip())
         errorWord.add(line.strip('\n').strip())
     for line in open('productName.csv', 'r', encoding='utf-8'):
         # 字符串拆分
@@ -190,10 +193,10 @@ def get_name():
                     squareBrackets.remove(item)
         # 处理合集
         # 可能还需要处理pack
-        if 'Collection' in name:
+        if 'Collection' in name or 'Pack' in name:
             isGet = False
             for item in roundBrackets:
-                # 去除括号 根据/和,分割字符串 去除空格 加入set
+                # 去除括号 根据/和,分割字符串 去除空格 加入pack
                 if '/' in item:
                     isGet = True
                     tmp = item.strip('(').strip(')')
@@ -201,10 +204,8 @@ def get_name():
                     for content in tmp:
                         if '(' in content and ')' not in content:
                             result.add(content.strip() + ')')
-                            # print(content.strip()+')')
                         else:
                             result.add(content.strip())
-                            # print(content.strip())
                 elif ',' in item:
                     isGet = True
                     tmp = item.strip('(').strip(')')
@@ -212,19 +213,23 @@ def get_name():
                     for content in tmp:
                         if '(' in content and ')' not in content:
                             result.add(content.strip() + ')')
-                            # print(content.strip() + ')')
                         else:
                             result.add(content.strip())
-                            # print(content.strip())
             if not isGet:
                 t = firstHalf.split(':', 1)
-                if 'Collection' in t[0] and len(t) > 1:
+                if ('Collection' in t[0] or 'Pack' in t[0]) and len(t) > 1:
                     t = t[1].split('/')
                     for content in t:
                         result.add(content.strip())
-                        # print(content.strip())
         else:
-            result.add(word_joint(firstHalf, roundBrackets, squareBrackets))
+            temp = word_joint(firstHalf, roundBrackets, squareBrackets)
+            if '/' in firstHalf:
+                t = temp.split('/')
+                for item in t:
+                    result.add(item.strip())
+            else:
+                result.add(temp)
+        # 这里处理结束之后可能需要回头再看一下多部电影的情况
     for item in result:
         print(item)
     print(len(result))
