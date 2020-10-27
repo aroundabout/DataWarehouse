@@ -37,9 +37,9 @@ def write_csv(number, Pid):
 1. 初步方案：
 
     * 使用python的request库进行网页的信息获取，再将获取的文本信息使用Beautiful Soup库进行解析，查找所需要的信息。
-        
+      
     * 使用技术：python request库，Beautiful Soup库
-        
+      
     * 在最初使用此方案时，能够正常获取信息。但由于amazon的反爬虫机制，获取效率在短时间内就大幅度下降，大部分时候只能访问到验证码界面。
     
 2. 改良方案：
@@ -47,7 +47,7 @@ def write_csv(number, Pid):
     * 在学习了解了amazon的反爬虫机制后，使用更换ip地址，随机请求头生成来进行伪装，使用了现成的proxy_pool工具，利用爬虫对免费的代理ip网址进行定时爬取ip并检验，维护一个可用的代理ip池，每次请求从ip池随机取出一个进行ip代理访问。
     
     * 使用技术：proxy_pool，Redis数据库
-        
+      
     * 在使用改良方案后，被amazon识别的次数有效降低了，但爬取速度对于25w的数据量稍显不足。
     
 3. 再次改进：
@@ -61,7 +61,7 @@ def write_csv(number, Pid):
     * 将所有url导入Redis数据库，每次获取时随机取出访问，访问失败再放回数据库中。
     
     * 使用request库进行页面的内容获取，利用beautiful soup进行页面解析，分析页面内容获取电影名。
-        
+      
     * 在爬虫运行时，另开进程进行代理ip池的维护，同样将可用代理ip存储于Redis数据库中，每次访问时利用代理ip池中的可用ip进行代理，同时使用fake_useragent库对请求的浏览器进行随机的变更，模拟是不同的用户在访问。
     
     * 再利用多进程和多线程并发最大化电脑的cpu利用率，提高爬取速度。
@@ -74,7 +74,20 @@ def write_csv(number, Pid):
 
 1. 分析标题内容
 
-    * 观察标题，发现在标题内的商品信息是多于电影名本身，如[VHS]等，为了更加有效的分析这些词，选择建立高频词词库，优先分析出现频率高的单词或词组
+    * 观察标题，发现在标题内的商品信息是多于电影名本身，如[VHS]等，为了更加有效的分析这些词，选择建立高频词词库，优先分析出现频率高的单词或词组，分析步骤如下：
+    
+        1. 将所有商品名用正则表达式分割成不带符号的单个单词，并且将单词写入csv文件
+    
+           ```python
+               for line in open("productName.csv",'r',encoding='utf-8')
+                   word_list=re.split(r"[\.,\s\n\r\n]+?",line)
+                   for word in word_list
+                       write_csv("Frequency.csv",word)
+           ```
+    
+        2. 利用Excel工具建立数据统计表，统计每一个单词的出现频率，并按照出现频率大小降序排序
+    
+           ![](C:\Users\dell\Desktop\pic.png)
     
     * 建立起词库之后开始对于词库内容分析，里面的词大致可以分成以下几个部分
     
@@ -92,20 +105,20 @@ def write_csv(number, Pid):
         
         * 是否为合集
         
-        * 宝莱坞\好莱坞出品
+    * 宝莱坞\好莱坞出品
         
         * collection pack表示合集
         
         * 一些关键属于表示电视剧或者动漫的第几季或者第几集或者第几卷
         
     * 根据一定的判定是否为同一部电影的原则，筛选出其中与电影版本本身无关的内容，加入高频词词库HighFrequencyWords.txt。大致原则如下：
-        
+      
         1. 商品的载体，如VHS，Blu-ray，XXX screen，3D等与是否为同一部电影无关
         
         1. 商品是否为Amazon独占与是否为同一部电影无关
         
         2. 商品的版本，如xxx edition等与是否为同一部电影无关
-
+    
         3. 商品的播出载体，如for psp等于是否为同一部电影无关
         
         3. 商品有几张disc与是否为同一部电影无关
@@ -127,7 +140,7 @@ def write_csv(number, Pid):
         9. 名字中出现合集collection和pack的情况有大概率内涵多部电影，对于字段拆分得到多部电影
         
     * 将电视剧，动漫等属于加入词库ErrorWord.txt，遇到带有这些词的名字可以直接删除
-        
+    
 2. 标题处理
 
     * 根据该上述原则对于电影名进行处理
@@ -152,7 +165,7 @@ def write_csv(number, Pid):
                     if len(ans) > 1 and key in ans[1]:
                         firstHalf = ans[0].strip()
                         break
-        ``` 
+        ```
       
         * 对于()和[]内的部分使用相同的手法操作，存在高频词则删除，防止干扰电影的一致性判断
         
@@ -164,7 +177,7 @@ def write_csv(number, Pid):
                 for item in squareBrackets:
                     if key in item:
                         squareBrackets.remove(item)
-         ```       
+         ```
         
         * 对于合集处理
         
@@ -202,15 +215,15 @@ def write_csv(number, Pid):
             ```
             
             2. 在经过后续其他部分的处理之后，若()和[]中没有内容了，且主体中还有'/'则再对主体进行切割（不对于','切割的理由是根据随机统计没有collection的时候','分割多个电影名的情况较少，同时可能切割到正常的电影名）
-         
+        
             ```python
                 if '/' in firstHalf and len(roundBrackets) == 0 and len(squareBrackets) == 0:
                 t = temp.split('/')
                 for item in t:
                     result.add(item.strip())
             ```
-         
+        
         * 重新拼接
-            
+          
             在完成了上述的步骤之后，按照主体 () []的顺序重新拼接，重新检测是否可能为电影集合并重新切割，将结果加入result集合,输出len(result)得到结果
         
