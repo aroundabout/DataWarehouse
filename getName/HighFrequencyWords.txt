@@ -30,7 +30,6 @@ Show
 UMD
 PSP
 Bollywood
-Ultimate
 Seasons
 FORMAT
 3D
@@ -57,3 +56,4 @@ Exclusive
 Amazon
 Fullscreen
 screen
+Subtitled

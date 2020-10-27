@@ -19,11 +19,11 @@ def write_csv(number, Pid):
 i = 0
 lastLine = ''
 create_csv()
+result = set()
 for line in open('movies.txt', 'r', encoding='ISO-8859-1'):
-    # print(line[0:19])
     if line[0:19] == 'product/productId: ':
         newLine = line[19:29]
-        if newLine != lastLine:
-            lastLine = newLine
-            write_csv(i, newLine)
-            i += 1
+        result.add(newLine)
+for item in result:
+    write_csv(i, item)
+    i += 1

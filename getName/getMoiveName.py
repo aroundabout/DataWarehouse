@@ -59,11 +59,11 @@ def create_csv():
         csv_write = csv.writer(f)
 
 
-def write_csv(number, Pid):
+def write_csv(number, content):
     path = "NewName.csv"
     with open(path, 'a+', newline='', encoding='utf-8') as f:
         csv_write = csv.writer(f)
-        data_row = [Pid]
+        data_row = [content]
         csv_write.writerow(data_row)
 
 
@@ -184,6 +184,13 @@ def get_name():
         # 清除高频词
         # 除了之后再()[]中，还要注意在fitsthalf中的部分比如editiion之类的
 
+        if '-' in firstHalf:
+            ans = firstHalf.split('-', 1)
+            for key in keyWord:
+                if len(ans) > 1 and key in ans[1]:
+                    firstHalf = ans[0].strip()
+                    break
+
         for key in keyWord:
             for item in roundBrackets:
                 if key in item:
@@ -223,15 +230,17 @@ def get_name():
                         result.add(content.strip())
         else:
             temp = word_joint(firstHalf, roundBrackets, squareBrackets)
-            if '/' in firstHalf:
+            if '/' in firstHalf and len(roundBrackets) == 0 and len(squareBrackets) == 0:
                 t = temp.split('/')
                 for item in t:
                     result.add(item.strip())
             else:
                 result.add(temp)
         # 这里处理结束之后可能需要回头再看一下多部电影的情况
+    create_csv()
     for item in result:
         print(item)
+        write_csv(0, item)
     print(len(result))
 
 
