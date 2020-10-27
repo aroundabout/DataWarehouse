@@ -19,17 +19,17 @@ def write_csv(number, Pid):
         data_row = [number, Pid]
         csv_write.writerow(data_row)
 
-    i = 0
-    lastLine = ''
-    create_csv()
-    result = set()
-    for line in open('movies.txt', 'r', encoding='ISO-8859-1'):
-        if line[0:19] == 'product/productId: ':
-            newLine = line[19:29]
-            result.add(newLine)
-    for item in result:
-        write_csv(i, item)
-        i += 1
+i = 0
+lastLine = ''
+create_csv()
+result = set()
+for line in open('movies.txt', 'r', encoding='ISO-8859-1'):
+    if line[0:19] == 'product/productId: ':
+        newLine = line[19:29]
+        result.add(newLine)
+for item in result:
+    write_csv(i, item)
+    i += 1
 ```
 
 ## 2.爬虫获取Product页面
@@ -79,10 +79,10 @@ def write_csv(number, Pid):
         1. 将所有商品名用正则表达式分割成不带符号的单个单词，并且将单词写入csv文件
     
            ```python
-               for line in open("productName.csv",'r',encoding='utf-8')
-                   word_list=re.split(r"[\.,\s\n\r\n]+?",line)
-                   for word in word_list
-                       write_csv("Frequency.csv",word)
+           for line in open("productName.csv",'r',encoding='utf-8')
+               word_list=re.split(r"[\.,\s\n\r\n]+?",line)
+               for word in word_list
+                   write_csv("Frequency.csv",word)
            ```
     
         2. 利用Excel工具建立数据统计表，统计每一个单词的出现频率，并按照出现频率大小降序排序
@@ -105,7 +105,7 @@ def write_csv(number, Pid):
         
         * 是否为合集
         
-    * 宝莱坞\好莱坞出品
+        * 宝莱坞\好莱坞出品
         
         * collection pack表示合集
         
@@ -139,7 +139,7 @@ def write_csv(number, Pid):
         
         9. 名字中出现合集collection和pack的情况有大概率内涵多部电影，对于字段拆分得到多部电影
         
-    * 将电视剧，动漫等属于加入词库ErrorWord.txt，遇到带有这些词的名字可以直接删除
+    * 将电视剧，动漫等相关的专用词汇加入词库ErrorWord.txt，遇到带有这些词的名字可以直接删除
     
 2. 标题处理
 
@@ -150,33 +150,33 @@ def write_csv(number, Pid):
         * 根据观察，商品名主要分成三个部分，主体，()内部分，[]内部分，使用正则表达式对字符串拆分处理
         
         ```python
-            name = line.strip('\n').strip(',').strip('\"')
-            roundBrackets = regex.findall(r'\(((?:[^()]+|(?R))+)\)', name)
-            squareBrackets = regex.findall(r"\[.+?\]", name)
-            firstHalf = regex.sub(u"\\[.*?]|\\{.*?}|\\(.*?\\)", "", name).strip()
+        name = line.strip('\n').strip(',').strip('\"')
+        roundBrackets = regex.findall(r'\(((?:[^()]+|(?R))+)\)', name)
+        squareBrackets = regex.findall(r"\[.+?\]", name)
+        firstHalf = regex.sub(u"\\[.*?]|\\{.*?}|\\(.*?\\)", "", name).strip()
         ```
       
         * 在主体部分，类似的关键词存在于 '-' 符号后面，于是对于主体再次分割，并且观测后半部分是否有高频词，若有，则保留前半部分
         
         ```python
-            if '-' in firstHalf:
-                ans = firstHalf.split('-', 1)
-                for key in keyWord:
-                    if len(ans) > 1 and key in ans[1]:
-                        firstHalf = ans[0].strip()
-                        break
+        if '-' in firstHalf:
+            ans = firstHalf.split('-', 1)
+            for key in keyWord:
+                if len(ans) > 1 and key in ans[1]:
+                    firstHalf = ans[0].strip()
+                    break
         ```
       
         * 对于()和[]内的部分使用相同的手法操作，存在高频词则删除，防止干扰电影的一致性判断
         
          ```python
-             for key in keyWord:
-                for item in roundBrackets:
-                    if key in item:
-                        roundBrackets.remove(item)
-                for item in squareBrackets:
-                    if key in item:
-                        squareBrackets.remove(item)
+         for key in keyWord:
+            for item in roundBrackets:
+                if key in item:
+                    roundBrackets.remove(item)
+            for item in squareBrackets:
+                if key in item:
+                    squareBrackets.remove(item)
          ```
         
         * 对于合集处理
@@ -184,43 +184,43 @@ def write_csv(number, Pid):
             1. 检测名字中是否有Collection或Pack等关键词，若存在，则先检测()在检测主体部分（经过观察，[]中不存在多个电影名，不做检测）中是否有'/'或','存在，若有，则做字符串切割并加入集合中
             
             ```python
-                if 'Collection' in name or 'Pack' in name:
-                    isGet = False
-                    for item in roundBrackets:
-                        # 去除括号 根据/和,分割字符串 去除空格 加入pack
-                        if '/' in item:
-                            isGet = True
-                            tmp = item.strip('(').strip(')')
-                            tmp = tmp.split('/')
-                            for content in tmp:
-                                if '(' in content and ')' not in content:
-                                    result.add(content.strip() + ')')
-                                else:
-                                    result.add(content.strip())
-                        elif ',' in item:
-                            isGet = True
-                            tmp = item.strip('(').strip(')')
-                            tmp = tmp.split(',')
-                            for content in tmp:
-                                if '(' in content and ')' not in content:
-                                    result.add(content.strip() + ')')
-                                else:
-                                    result.add(content.strip())
-                    if not isGet:
-                        t = firstHalf.split(':', 1)
-                        if ('Collection' in t[0] or 'Pack' in t[0]) and len(t) > 1:
-                            t = t[1].split('/')
-                            for content in t:
+            if 'Collection' in name or 'Pack' in name:
+                isGet = False
+                for item in roundBrackets:
+                    # 去除括号 根据/和,分割字符串 去除空格 加入pack
+                    if '/' in item:
+                        isGet = True
+                        tmp = item.strip('(').strip(')')
+                        tmp = tmp.split('/')
+                        for content in tmp:
+                            if '(' in content and ')' not in content:
+                                result.add(content.strip() + ')')
+                            else:
                                 result.add(content.strip())
+                    elif ',' in item:
+                        isGet = True
+                        tmp = item.strip('(').strip(')')
+                        tmp = tmp.split(',')
+                        for content in tmp:
+                            if '(' in content and ')' not in content:
+                                result.add(content.strip() + ')')
+                            else:
+                                result.add(content.strip())
+                if not isGet:
+                    t = firstHalf.split(':', 1)
+                    if ('Collection' in t[0] or 'Pack' in t[0]) and len(t) > 1:
+                        t = t[1].split('/')
+                        for content in t:
+                            result.add(content.strip())
             ```
             
             2. 在经过后续其他部分的处理之后，若()和[]中没有内容了，且主体中还有'/'则再对主体进行切割（不对于','切割的理由是根据随机统计没有collection的时候','分割多个电影名的情况较少，同时可能切割到正常的电影名）
         
             ```python
-                if '/' in firstHalf and len(roundBrackets) == 0 and len(squareBrackets) == 0:
-                t = temp.split('/')
-                for item in t:
-                    result.add(item.strip())
+            if '/' in firstHalf and len(roundBrackets) == 0 and len(squareBrackets) == 0:
+            t = temp.split('/')
+            for item in t:
+                result.add(item.strip())
             ```
         
         * 重新拼接
