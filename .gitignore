@@ -1,2 +1,13 @@
 .idea/.gitignore
 .idea/
+clean_date/
+homework2/neo4j/belong.csv
+homework2/neo4j/belong-header.csv
+homework2/neo4j/movie.csv
+homework2/neo4j/movie-header.csv
+homework2/neo4j/product.csv
+homework2/neo4j/product-header.csv
+homework2/neo4j/review.csv
+homework2/neo4j/review-header.csv
+homework2/neo4j/user.csv
+homework2/neo4j/user-header.csv
