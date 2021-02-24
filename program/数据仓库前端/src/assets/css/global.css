@@ -1,0 +1,21 @@
+/*
+全局样式
+*/
+html,
+body,
+#app{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+.el-breadcrumb{
+    margin-bottom: 15px;
+}
+
+.el-card{
+    margin-bottom: 15px;
+}
+
+

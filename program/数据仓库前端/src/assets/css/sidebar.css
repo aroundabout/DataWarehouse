@@ -1,0 +1,52 @@
+.sidebar {
+    height: 100vh;
+    width: auto !important;
+}
+
+.el-menu {
+    height: 100vh;
+    background-color: #304156;
+    transition: none;
+    overflow: hidden;
+}
+
+.submenu {
+    background-color: #304156;
+}
+
+.submenu :hover {
+    background-color: rgb(38, 52, 69);
+}
+
+.el-menu-item {
+    background-color: #304156;
+    text-align: left;
+    padding-left: 20px;
+    padding-right: 50px;
+}
+
+.el-menu-item:hover {
+    background-color: rgb(38, 52, 69);
+}
+
+.el-menu-item.is-active {
+    background-color: #304156;
+}
+
+.el-menu-item a {
+    color: rgb(191, 203, 217);
+    text-decoration: none;
+}
+
+.el-menu-item.is-active span {
+    color: #409EFF;
+}
+
+.avatar {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    margin-top: 5px;
+    margin-left: 7px;
+}
